@@ -1,1 +1,18 @@
-/.metadata/
+# Maven
+target/
+
+# Gradle
+build/
+
+# IntelliJ
+.idea/
+*.iml
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# OS-specific
+.DS_Store
+Thumbs.db
