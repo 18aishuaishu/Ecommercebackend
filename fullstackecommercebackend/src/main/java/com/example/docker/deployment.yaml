@@ -1,0 +1,48 @@
+name: Build and Deploy to AKS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+
+    - name: Build JAR
+      run: ./mvnw clean package
+
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Build and Push Docker image
+      uses: azure/docker-login@v1
+      with:
+        login-server: ecommerceacr123.azurecr.io
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    - run: |
+        docker build -t <your-acr-name>.azurecr.io/springboot-app:latest .
+        docker push <your-acr-name>.azurecr.io/springboot-app:latest
+
+    - name: Set AKS context
+      uses: azure/aks-set-context@v3
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        cluster-name: myAKSCluster
+        resource-group: myNewResourceGroup
+
+    - name: Deploy to AKS
+      run: |
+        kubectl apply -f k8s/

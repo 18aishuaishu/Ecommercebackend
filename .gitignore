@@ -1,6 +1,6 @@
 # Maven
 target/
-
+.metadata/
 # Gradle
 build/
 
